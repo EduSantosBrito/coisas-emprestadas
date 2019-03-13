@@ -4,7 +4,7 @@ import { Button } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker';
 import ItemEmprestado from '../model/ItemEmprestado';
 
-let itemList = {};
+let itemListFromLocalStorage = {};
 export default class ItemForm extends Component {
     static navigationOptions = {
         title: 'Emprestar Item'
@@ -17,18 +17,25 @@ export default class ItemForm extends Component {
         return (new ItemEmprestado(), { isLoading: false });
     }
     _storeDataToLocalStorage = async (Item) => {
-        await AsyncStorage.setItem('ItemList', JSON.stringify(Item));
+        await AsyncStorage.setItem('itemList', JSON.stringify(Item));
     };
     _restoreDataFromLocalStorage = async () => {
-        await AsyncStorage.getItem('ItemList')
+        await AsyncStorage.getItem('itemList')
             .then(result => {
                 let data = JSON.parse(result);
-                itemList = data !== null ? data : null;
+                console.log(data);
+                itemListFromLocalStorage = data !== null ? data : {};
             });
     }
-    onCreateItem = () => {
+    onCreateItem = async () => {
+        let item = new ItemEmprestado();
+        item.nomeDoItem = this.state.nomeDoItem;
+        item.nomeFavorecido = this.state.nomeFavorecido;
+        item.dataDevolucao = this.state.dataDevolucao;
+        item.dataEmprestimo = this.state.dataEmprestimo;
+        itemListFromLocalStorage.push(item);
+        await this._storeDataToLocalStorage(itemListFromLocalStorage);
         this.setState({ isLoading: true });
-        console.log(itemList);
     }
     componentWillMount() {
         this._restoreDataFromLocalStorage();

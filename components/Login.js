@@ -11,18 +11,23 @@ _storeData = async (credentials) => {
 };
 
 export default class Login extends Component {
-
+    static navigationOptions = {
+        header: null
+    }
     constructor(props) {
         super(props);
 
-        this.state = {
+        this.state = this.getInitialState();
+    }
+
+    getInitialState = () => {
+        return {
             username: '',
             password: '',
             isLogged: false,
             isLoading: false
         }
     }
-
     loginAction() {
         if (this.state.isLogged) {
             this.onLogin();
