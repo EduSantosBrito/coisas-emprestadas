@@ -2,25 +2,18 @@ import React, { Component } from 'react'
 import { Button } from 'react-native-elements';
 import { ImageBackground, TextInput, StyleSheet, Text, AsyncStorage } from 'react-native';
 
-_storeData = async (credentials) => {
-    try {
-        await AsyncStorage.setItem('credentials', JSON.stringify(credentials));
-    } catch (error) {
-        console.log(error.message);
-    }
+_storeDataToLocalStorage = async (credentials) => {
+    await AsyncStorage.setItem('credentials', JSON.stringify(credentials));
 };
 
 export default class Login extends Component {
-
+    static navigationOptions = {
+        header: null
+    }
     constructor(props) {
         super(props);
 
-        this.state = {
-            username: '',
-            password: '',
-            isLogged: false,
-            isLoading: false
-        }
+        this.state = this.getInitialState();
     }
 
     loginAction() {
@@ -32,20 +25,29 @@ export default class Login extends Component {
     async fetchName() {
         await AsyncStorage.getItem('credentials')
             .then(result => {
-                credentials = JSON.parse(result);
+                let credentials = JSON.parse(result);
                 credentials !== null ? this.setState({ username: credentials.username, password: credentials.password, isLogged: true, isLoading: true }) : null;
             });
         await this.loginAction();
     }
 
     onLogin() {
+        //TO-DO: Verificar se tá em branco
         const { username, password } = this.state;
-        _storeData({ username, password });
+        _storeDataToLocalStorage({ username, password });
         this.props.navigation.navigate('Main');
-        isLoading = false;
+        this.setState({ isLoading: false });
     }
-
+    getInitialState() {
+        return {
+            username: '',
+            password: '',
+            isLogged: false,
+            isLoading: false
+        };
+    }
     componentWillMount() {
+        this.setState(this.getInitialState());
         this.fetchName();
     }
 
